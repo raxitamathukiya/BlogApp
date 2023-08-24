@@ -83,34 +83,74 @@ button:hover {
 
     <section id="signup-login">
         <div class="form-container">
-          <h1>Welcome to Blog Application</h1>
+
+            <h1>Login To Blog Application</h1>
+            <form id="login-form">
+                <input type="email" placeholder="Email" required id="email">
+                <input type="password" placeholder="Password" required id="password">
+                <input type="submit" >
+            </form>
         </div>
     </section>
-<script>
-      let token=JSON.parse(localStorage.getItem('token'))
+
+    <script>
+          let token=JSON.parse(localStorage.getItem('token'))
       let userid=JSON.parse(localStorage.getItem('userid'))
       let name=document.getElementById('name')
       let signup=document.getElementById('signup')
       let signin=document.getElementById('signin')
       let blog=document.getElementById('blog')
 
-        if(token){
-            name.innerText=userid
-            signin.innerText=""
-            signup.innerText=""
-            blog.addEventListener('click',()=>{
-                window.location='./blog.html'
-            })
+if(token){
+    name.innerText=userid
+    signin.innerText=""
+    signup.innerText=""
+    blog.addEventListener('click',()=>{
+        window.location='./blog.html'
+    })
 
-        }else{
-            blog.addEventListener('click',()=>{
-                alert('please login')
-            })
-        }
-
+}else{
+    blog.addEventListener('click',()=>{
+        alert('please login')
+    })
+}
       
+       let formlogin=document.getElementById("login-form");
+        let email=document.getElementById('email')
+        let password=document.getElementById('password')
 
+ formlogin.addEventListener("submit",(e)=>{
+    e.preventDefault();
+   let obj={
+    email:email.value,
+    password:password.value
+   }
+   fetch("https://blogapplication-xhxb.onrender.com/api/login",{
+    method:"POST",
+    headers:{
+        "Content-type":"application/json"
+    },
+    body:JSON.stringify(obj)
+   })
+   .then((res)=>{
+    return res.json();
+   })
+   .then((data)=>{
+    console.log(data)
+    if(data.token){
+     alert(data.msg);
+    
+      localStorage.setItem("token",JSON.stringify(data.token));
+      localStorage.setItem("userid",JSON.stringify(data.userid));
+      window.location.href="./index.html";
+ 
+    }
+    
+    
+   })
+ })
 
-</script>
+ 
+    </script>
 </body>
 </html>

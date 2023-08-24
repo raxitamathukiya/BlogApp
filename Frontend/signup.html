@@ -83,34 +83,75 @@ button:hover {
 
     <section id="signup-login">
         <div class="form-container">
-          <h1>Welcome to Blog Application</h1>
+          
+            <h1>Register To Blog Application</h1>
+            <form id="signup-form">
+                <input type="text" placeholder="Enter UserName" required id="username">
+                <input type="url" placeholder="Enter Profile Image URL" required id="image" >
+                <input type="email" placeholder="Email" required id="remail">
+                <input type="password" placeholder="Password" required id="rpassword">
+               
+                <input type="submit">
+            </form>
         </div>
     </section>
-<script>
-      let token=JSON.parse(localStorage.getItem('token'))
+
+    <script>
+       
+       let token=JSON.parse(localStorage.getItem('token'))
       let userid=JSON.parse(localStorage.getItem('userid'))
       let name=document.getElementById('name')
       let signup=document.getElementById('signup')
       let signin=document.getElementById('signin')
       let blog=document.getElementById('blog')
 
-        if(token){
-            name.innerText=userid
-            signin.innerText=""
-            signup.innerText=""
-            blog.addEventListener('click',()=>{
-                window.location='./blog.html'
-            })
+if(token){
+    name.innerText=userid
+    signin.innerText=""
+    signup.innerText=""
+    blog.addEventListener('click',()=>{
+        window.location='./blog.html'
+    })
 
-        }else{
-            blog.addEventListener('click',()=>{
-                alert('please login')
-            })
-        }
+}else{
+    blog.addEventListener('click',()=>{
+        alert('please login')
+    })
+}
 
-      
+ let formsignup=document.getElementById("signup-form");
+        let emails=document.getElementById('remail')
+        let passwords=document.getElementById('rpassword')
+        let username=document.getElementById('username')
+        let image=document.getElementById('image')
 
-
-</script>
+    formsignup.addEventListener("submit",(e)=>{
+    e.preventDefault();
+   let obj={
+    email:emails.value,
+    password:passwords.value,
+    Username:username.value,
+    avtar:image.value,
+   }
+   fetch("https://blogapplication-xhxb.onrender.com/api/register",{
+    method:"POST",
+    headers:{
+        "Content-type":"application/json"
+    },
+    body:JSON.stringify(obj)
+   })
+   .then((res)=>{
+    console.log(res)
+    return res.json();
+   })
+   .then((data)=>{
+     alert(data.msg);
+      window.location.href="./signin.html";
+    
+   })
+ })
+ 
+ 
+    </script>
 </body>
 </html>

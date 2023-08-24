@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management App</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+}
+
+nav li {
+    margin-right: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #fff;
+}
+
+.form-container {
+    width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+form {
+    margin-top: 20px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+.hidden {
+    display: none;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li style="margin-left: 30px;"><a href="./index.html">Home</a></li>
+                <li id="signup"><a href="./signup.html">SignUp</a></li>
+                <li id="signin"><a href="./signin.html">SignIn</a></li>
+                <li id="name"></li>
+                <li id="blog">Blogs</a></li>
+                <li><a href="./cblog.html">Create Blogs</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="signup-login">
+        <div class="form-container">
+            <h2>Blogs</h2>
+            <input type="text" id="search" placeholder="search by Blog Title">
+            <button id="btn">Search</button>
+            <h2>Filter blog by Category</h2>
+            <select name="Category" id="Category">
+                <option value=""></option>
+                <option value="Business">Business</option>
+                <option value="Tech">Tech</option>
+                <option value="Lifestyle">Lifestyle</option>
+                <option value="Entertainment">Entertainment</option>
+
+            </select>
+            <div id="main"></div>
+        
+        </div>
+    </section>
+
+    <script>
+          let search=document.getElementById('search')
+      let sbtn=document.getElementById('btn')
+         let token=JSON.parse(localStorage.getItem('token'))
+      let userid=JSON.parse(localStorage.getItem('userid'))
+      let name=document.getElementById('name')
+      let signup=document.getElementById('signup')
+      let signin=document.getElementById('signin')
+      let blog=document.getElementById('blog')
+      let Category=document.getElementById('Category')
+
+      Category.addEventListener('change',async()=>{
+      try {
+          if(Category.value==""){
+              fetchdata()
+          }else{
+              let res=await fetch(`https://blogapplication-xhxb.onrender.com/api/blogs/?Category=${Category.value}`,{
+              method:"GET",
+              headers:{
+                     "Content-type":"application/json",
+                     'Authorization': `Bearer ${token}`
+                  },
+          })
+          let data=await res.json()
+          display(data)
+          }
+      } catch (error) {
+          console.log(error)
+      }
+})
+
+if(token){
+    name.innerText=userid
+    signin.innerText=""
+    signup.innerText=""
+    blog.addEventListener('click',()=>{
+        window.location='./blog.html'
+    })
+
+}else{
+    blog.addEventListener('click',()=>{
+        alert('please login')
+    })
+}
+sbtn.addEventListener('click',async()=>{
+            try {
+                let res=await fetch(`https://blogapplication-xhxb.onrender.com/api/blogs/?Title=${search.value}`,{
+                    method:"GET",
+                    headers:{
+                           "Content-type":"application/json",
+                           'Authorization': `Bearer ${token}`
+                        },
+                })
+                let data=await res.json()
+                //console.log(data)
+                display(data)
+            } catch (error) {
+                console.log(error)
+            }
+      })
+      
+let main=document.getElementById('main')
+fetchdata()
+async function  fetchdata(){
+    try {
+        let res=await fetch('https://blogapplication-xhxb.onrender.com/api/blogs',{
+            method:"GET",
+                     headers:{
+                         'Content-type':'application/json' ,
+                         'Authorization': `Bearer ${token}`
+                     },
+        })
+        let data=await res.json()
+        console.log(data)
+        display(data)
+    } catch (error) {
+        console.log(error)
+    }
+}
+ function display(data){
+    main.innerHTML=""
+    data.forEach(element => {
+        let div=document.createElement("div")
+        let username=document.createElement('h1')
+        username.innerText=`User: ${element.Username}`
+        let title=document.createElement('h2')
+        title.innerText=`Title: ${element.Title}`
+        let Content=document.createElement('p')
+        Content.innerText=`Content: ${element.Content}`
+        let Category=document.createElement('p')
+        Category.innerText=`Category: ${element.Category}`
+        let Date=document.createElement('p')
+        Date.innerText=`Date: ${element.Date}`
+        let lik=document.createElement('p')
+        lik.innerText=`likes: ${element.likes.length}`
+        let bt1=document.createElement('button')
+        bt1.innerText="EDIT"
+        let bt2=document.createElement('button')
+        bt2.innerText="DELETE"
+        let likes=document.createElement('button')
+        bt2.addEventListener('click',async()=>{
+            try {
+                let res=await fetch(`https://blogapplication-xhxb.onrender.com/api/blogs/${element._id}`,{
+            method:"DELETE",
+                     headers:{
+                         'Content-type':'application/json' ,
+                         'Authorization': `Bearer ${token}`
+                     },
+        })
+        //let data=await res.json()
+        alert('blog deleted')
+        window.location.reload()
+            } catch (error) {
+                console.log(error)
+            }
+        })
+        likes.innerText="Likes"
+        likes.addEventListener('click',async()=>{
+            try {
+                let res=await fetch(`https://blogapplication-xhxb.onrender.com/api/blogs/${element._id}/like`,{
+            method:"PUT",
+                     headers:{
+                         'Content-type':'application/json' ,
+                         'Authorization': `Bearer ${token}`
+                     },
+        })
+        let data=await res.json()
+        alert(data.message)
+        window.location.reload()
+            } catch (error) {
+                console.log(error)
+            }
+        })
+       let cdiv=document.createElement('div')
+       let chead=document.createElement('h4')
+       chead.innerText="Comments"
+       for(let i=0;i<element.comments.length;i++){
+        let cusername=document.createElement('p')
+        let ccon=document.createElement('p')
+        cusername.innerText=`UserName: ${element.comments[i].username}`
+        ccon.innerText=`Content:${element.comments[i].content}`
+        cdiv.append(chead,cusername,ccon)
+
+       }
+
+        div.append(username,title,Content,Category,Date,lik,likes,cdiv,bt1,bt2)
+        main.append(div)
+
+    });
+ }
+</script>
+</body>
+</html>
+
+ 
